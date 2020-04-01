@@ -12,6 +12,7 @@ project_key="sof-audio"
 }
 
 if [ "X$begin_time" == "X0" ]; then
+    echo "Fred: cmd=dmesg"
     cmd="dmesg"
 else
     date -d "$begin_time" +'%F %T' > /dev/null || {
@@ -19,14 +20,16 @@ else
         echo "Support date format: date +'%F %T'"
         builtin exit 0
     }
-    journalctl --flush
+    echo "Fred: cmd=journalctl --dmesg --no-pager --no-hostname -o short-precise --since='$begin_time'"
+    sudo journalctl --flush
     cmd="journalctl --dmesg --no-pager --no-hostname -o short-precise --since='$begin_time'"
 fi
 
 if [ "$ignore_str" ]; then
-    err=$(eval "$cmd"|grep 'Call Trace' -A5 -B3)$(eval "$cmd" | grep $project_key | grep -E "$err_str"|grep -vE "$ignore_str")
+    eval "$cmd"
+    err=$(eval "$cmd"|grep 'Call Trace' -A5 -B3)$(eval "$cmd" | grep -E "$err_str"|grep -vE "$ignore_str")
 else
-    err=$(eval "$cmd"|grep 'Call Trace' -A5 -B3)$(eval "$cmd" | grep $project_key | grep -E "$err_str")
+    err=$(eval "$cmd"|grep 'Call Trace' -A5 -B3)$(eval "$cmd" | grep -E "$err_str")
 fi
 
 if [ "$err" ]; then

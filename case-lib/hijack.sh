@@ -21,9 +21,11 @@ function func_exit_handler()
     fi
     # when case ends, store kernel log
     if [[ -n "$CASE_KERNEL_START_TIME" ]]; then
-        journalctl --flush
+        echo "Fred: kernel start time=$$CASE_KERNEL_START_TIME"
+        sudo journalctl --flush
         journalctl --dmesg --no-pager --no-hostname -o short-precise --since="$CASE_KERNEL_START_TIME" > "$LOG_ROOT/dmesg.txt"
     else
+        echo "Fred: no kernel start time"
         journalctl --dmesg --no-pager --no-hostname -o short-precise > "$LOG_ROOT/dmesg.txt"
     fi
 

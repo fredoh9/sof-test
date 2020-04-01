@@ -44,6 +44,7 @@ func_lib_setup_kernel_last_time()
     KERNEL_LAST_TIME=$(journalctl --dmesg --no-pager -n 1 -o short-iso-precise|awk '/kernel/ {print $1;}')
     KERNEL_LAST_TIME=${KERNEL_LAST_TIME:0:-5}
     KERNEL_LAST_TIME=${KERNEL_LAST_TIME/T/ }
+    echo "Fred: KERNEL_LAST_TIME=$KERNEL_LAST_TIME"
 }
 
 SOF_LOG_COLLECT=0
@@ -193,8 +194,10 @@ func_lib_get_tplg_path()
     return 0
 }
 
-journalctl --flush
+echo "Fred: call journalctl --flush from lib.sh"
+sudo journalctl --flush
 if [ ! "$CASE_KERNEL_START_TIME" ]; then
+    echo "Fred: set KERNL_START_TIME with $KERNEL_LAST_TIME"
     # format time stamp output for journalctl command
     func_lib_setup_kernel_last_time
     CASE_KERNEL_START_TIME="$KERNEL_LAST_TIME"
