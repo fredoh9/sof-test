@@ -1,10 +1,9 @@
 #!/bin/bash
 
 begin_line=${1:-1}
-declare err_str ignore_str project_key
+declare err_str ignore_str
 err_str="error|failed|timed out|panic|oops"
 ignore_str=""
-project_key="sof-audio"
 
 # There will be debug logs at each failed initializaiton of DSP:
 #   sof-audio-pci 0000:00:1f.3: error: status = 0x00000000 panic = 0x00000000
@@ -18,6 +17,9 @@ ignore_str="$ignore_str|error: status"
 
 # TODO
 ignore_str="$ignore_str|error: debugfs write failed to idle -16"
+
+# TODO: Fred: update sdw parity issue link, checking with realtek
+ignore_str='$ignore_str|Parity error detected'
 
 [[ ! "$err_str" ]] && echo "Missing error keyword list" && exit 0
 # dmesg KB size buffer size
@@ -35,9 +37,9 @@ ignore_str="$ignore_str|error: debugfs write failed to idle -16"
 #echo "run $0 with parameter '$*' for check kernel message error"
 
 if [ "$ignore_str" ]; then
-    err=$(eval $cmd|grep 'Call Trace' -A5 -B3)$(eval $cmd | grep $project_key | grep -E "$err_str"|grep -vE "$ignore_str")
+    err=$(eval $cmd|grep 'Call Trace' -A5 -B3)$(eval $cmd | grep -E "$err_str"|grep -vE "$ignore_str")
 else
-    err=$(eval $cmd|grep 'Call Trace' -A5 -B3)$(eval $cmd | grep $project_key | grep -E "$err_str")
+    err=$(eval $cmd|grep 'Call Trace' -A5 -B3)$(eval $cmd | grep -E "$err_str")
 fi
 
 if [ "$err" ]; then
