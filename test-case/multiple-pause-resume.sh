@@ -154,7 +154,12 @@ do
         declare -a pid_lst
         for idx in $pipeline_combine_str
         do
-            func_pause_resume_pipeline "$idx"
+            func_pause_resume_pipeline "$idx" || {
+                ret=$?
+                printf '\n\nERROR: pause_resume expect failed, returned %d\n' "$ret"
+                sof-process-kill.sh || dlogs 'failed to cleanup audio processes'
+                exit 1
+            }
             pid_lst=("${pid_lst[@]}" $!)
         done
         # wait for expect script finished
